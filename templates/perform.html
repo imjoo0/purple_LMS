@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- script -->
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+
+    <!-- meta 태그 -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 부트스트랩 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/style/style.css">
+    <link rel="shortcut icon" href="../static/images/favicon.ico">
+
+    <!-- 차트 작성 위한 script -->
+    <script>
+        window.Promise ||
+            document.write(
+            '<script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"><\/script>'
+            )
+        window.Promise ||
+            document.write(
+                '<script src="https://cdn.jsdelivr.net/npm/eligrey-classlist-js-polyfill@1.2.20171210/classList.min.js"><\/script>'
+            )
+        window.Promise ||
+            document.write(
+                '<script src="https://cdn.jsdelivr.net/npm/findindex_polyfill_mdn"><\/script>'
+            )
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <title>상담페이지 - 업무관리</title>
+</head>
+<body>
+    <!-- 모달 -->
+    <!-- 로그아웃 모달 -->
+    <div class="modal fade" id="sign-out" tabindex="-1" aria-labelledby="signOutModealLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="signOutModealLabel">로그아웃</h5>
+                    <button type="button" class="btn btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    로그아웃 하시겠습니까?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success">확인</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상담일지 모달 -->
+    <div class="modal fade" id="counselling-record" tabindex="-1" aria-labelledby="counsellingRecordModealLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" >
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="counsellingRecordModealLabel">상담일지</h5>
+                    <button type="button" class="btn btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="img-container">
+                            <!-- <textarea class="form-control" placeholder=" " id="floatingTextarea" style="height: 400px"></textarea>
+                            <label for="floatingTextarea">상담일지</label> -->
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success">저장</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 네비게이션 -->
+    <nav class="navbar navbar-expand-md navbar-light">
+        <button class="navbar-toggler ml-auto mb-2 bg-light" type="button" data-toggle="collapse" data-target="#sidebar">
+            <span class="navbar-toggle-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="sidebar">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- 사이드바 -->
+                    <div class="sidebar fixed-top right-border">
+                        <a href="/index.html" class="navbar-brand text-center d-block mx-auto py-4 bottom-border"><img src="../static/images/purple_logo_03.png"></a>
+                        <div class="bottom-border text-center">
+                            <p class="pt-4">ㅇㅇㅇ님 환영합니다.</p>
+                        </div>
+                        <ul class="navbar-nav flex-column mt-4">
+                            <!-- 사이드바 메뉴 -->
+                            <li class="nav-item">
+                                <a href="/perform" class="nav-link p-1 mb-2 current p-2">
+                                    <i class="fa-solid fa-list-check fa-lg me-3 ms-3"></i>업무관리
+                                </a>
+                                <a href="/user" class="nav-link p-1 mb-2 sidebar-link p-2">
+                                    <i class="fa-solid fa-user-group fa-lg me-3 ms-3"></i>회원관리
+                                </a>
+                                <a href="/counselling" class="nav-link p-1 mb-2 sidebar-link p-2">
+                                    <i class="fa-solid fa-comments fa-lg me-3 ms-3"></i>상담관리
+                                </a>
+                                <a href="/schedule" class="nav-link p-1 mb-2 sidebar-link p-2">
+                                    <i class="fa-regular fa-calendar fa-lg me-3 ms-3 px-1"></i>일정관리
+                                </a>
+                                <a href="/mypage" class="nav-link p-1 mb-2 sidebar-link p-2">
+                                    <i class="fa-solid fa-gears fa-lg me-3 ms-3"></i>마이페이지
+                                </a>
+                                <!-- sidebar-link 클래스 제거하고 current 클래스 추가하여 현재 페이지 표현  -->
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 상단 네비게이션바 -->
+                    <div class="top-nav-bar ms-auto fixed-top py-3 bottom-border">
+                        <div class="row py-1">
+                            <div class="col d-flex align-items-center">
+                                <h4 class="nav-title mb-0"><i class="fa-solid fa-list-check fa-md me-3"></i>업무관리</h4>
+                            </div>
+                            <div class="col d-flex justify-content-end me-4">
+                                <ul class="navbar-nav">
+                                    <li class="nav-item icon-parent me-2"><a href="#" class="nav-link icon-bullet"><i class="fas fa-bell text-muted fa-lg"></i></a></li>
+                                    <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#sign-out"><i class="fas fa-sign-out-alt text-danger fa-lg"></i></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section id="today">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="card-container ms-auto">
+                    <div class="row pt-5 mt-3 mb-1">
+                        <div class="col-sm-12 p-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="p-3"><strong>Today</strong></h5>
+                                    <ul class="nav nav-tabs card-header-tabs">
+                                        <li class="nav-item">
+                                            <a id="all_nav" class="nav-link active" onclick="all_nav_click()">미완료</a>
+                                        </li>
+                                        <!-- <li class="nav-item">
+                                            <a id="counselling_nav" class="nav-link" onclick="counselling_nav_click()">상담 리스트</a>
+                                        </li>
+                                        <li id="day-work" class="nav-item">
+                                            <a id="day_nav" class="nav-link" onclick="day_nav_click()">요일 별 업무</a>
+                                        </li> -->
+                                        <li class="nav-item">
+                                            <a id="complete_nav" class="nav-link" onclick="complete_nav_click()">완료</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- 전체 -->
+                                <div id="all_body" class="card-body p-5">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="card col-12 mb-5">
+                                                <div class="card-header">
+                                                    <h6 class="p-2 pb-0"><strong>Summary</strong></h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row justify-content-center align-items-center mt-2 mb-4">
+                                                        <div class="col-4 ps-3">
+                                                            <p class="mb-0">반 별 통계</p>
+                                                        </div>
+                                                        <div class="col-7">
+                                                            <select class="form-select" aria-label="Default select example">
+                                                                <option selected>반을 선택하세요.</option>
+                                                                <option value="1">COLUMBIA P2</option>
+                                                                <option value="2">DARTMOUTH1401</option>
+                                                                <option value="3">Venus A2</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <!-- 차트 -->
+                                                    <div class="container border rounded-3 p-4 pb-1">
+                                                        <div id="chart"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card col-12 mt-5">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <h6 class="p-2 pb-0"><strong>오늘의 상담</strong></h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <table class="table text-center">
+                                                            <tbody>
+                                                                <tr class="row">
+                                                                    <th class="col-3">원번</th>
+                                                                    <th class="col-3">이름</th>
+                                                                    <th class="col-3">내용</th>
+                                                                    <th class="col-3">상태</th>
+                                                                </tr>
+                                                                <tr class="row" data-bs-toggle="modal" data-bs-target="#counselling-record">
+                                                                    <td class="col-3">P220000</td>
+                                                                    <td class="col-3">이ㅇㅇ</td>
+                                                                    <td class="col-3">4주 미학습</td>
+                                                                    <td class="col-3">미완료</td>
+                                                                </tr>
+                                                                <tr class="row">
+                                                                    <td class="col-3">P220000</td>
+                                                                    <td class="col-3">김ㅇㅇ</td>
+                                                                    <td class="col-3">2주 미학습</td>
+                                                                    <td class="col-3">미완료</td>
+                                                                </tr>
+                                                                <tr class="row">
+                                                                    <td class="col-3">P220000</td>
+                                                                    <td class="col-3">최ㅇㅇ</td>
+                                                                    <td class="col-3">2주 미학습</td>
+                                                                    <td class="col-3">미완료</td>
+                                                                </tr>
+                                                                <tr class="row">
+                                                                    <td class="col-3">P220000</td>
+                                                                    <td class="col-3">박ㅇㅇ</td>
+                                                                    <td class="col-3">2주 미학습</td>
+                                                                    <td class="col-3">미완료</td>
+                                                                </tr>
+                                                                <tr class="row">
+                                                                    <td class="col-3">P220000</td>
+                                                                    <td class="col-3">김ㅇㅇ</td>
+                                                                    <td class="col-3">2주 미학습</td>
+                                                                    <td class="col-3">미완료</td>
+                                                                </tr>
+                                                                <tr class="row">
+                                                                    <td class="col-3">P220000</td>
+                                                                    <td class="col-3">이ㅇㅇ</td>
+                                                                    <td class="col-3">2주 미학습</td>
+                                                                    <td class="col-3">미완료</td>
+                                                                </tr>
+                                                                <tr class="row">
+                                                                    <td class="col-3">P220000</td>
+                                                                    <td class="col-3">박ㅇㅇ</td>
+                                                                    <td class="col-3">6개월</td>
+                                                                    <td class="col-3">미완료</td>
+                                                                </tr>
+                                                                <tr class="row">
+                                                                    <td class="col-3">P220000</td>
+                                                                    <td class="col-3">양ㅇㅇ</td>
+                                                                    <td class="col-3">해피콜</td>
+                                                                    <td class="col-3">미완료</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h6 class="p-2 pb-0"><strong>오늘의 업무</strong></h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row justify-content-center align-items-center mt-2 mb-4">
+                                                        <div class="col-4 ps-3">
+                                                            <p class="mb-0">반 별 업무</p>
+                                                        </div>
+                                                        <div class="col-7">
+                                                            <select class="form-select" aria-label="Default select example">
+                                                                <option selected>반을 선택하세요.</option>
+                                                                <option value="1">COLUMBIA P2</option>
+                                                                <option value="2">DARTMOUTH1401</option>
+                                                                <option value="3">Venus A2</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row justify-content-center align-items-center">
+                                                        <div class="col-11">
+                                                            <table class="table text-center">
+                                                                <tbody>
+                                                                    <tr class="row">
+                                                                        <th class="col-2">체크</th>
+                                                                        <th class="col-2">구분</th>
+                                                                        <th class="col-8">업무</th>
+                                                                    </tr>
+                                                                    <tr class="row">
+                                                                        <td class="col-2">
+                                                                            <i class="fa-solid fa-check"></i>
+                                                                        </td>
+                                                                        <td class="col-2">요일</td>
+                                                                        <td class="col-8">IXL 주차 설정을 월요일 오전에 완료하였는가?</td>
+                                                                    </tr>
+                                                                    <tr class="row">
+                                                                        <td class="col-2">
+                                                                            <i class="fa-solid fa-check"></i>
+                                                                        </td>
+                                                                        <td class="col-2">요일</td>
+                                                                        <td class="col-8">키즈노트 공지사항에 주차학습공지를 월요일에 업로드하였는가?</td>
+                                                                    </tr>
+                                                                    <tr class="row">
+                                                                        <td class="col-2">
+                                                                            <i class="fa-solid fa-check"></i>
+                                                                        </td>
+                                                                        <td class="col-2">요일</td>
+                                                                        <td class="col-8">[리딩특공대] 선생님 코멘트를 월요일에 작성하였는가?</td>
+                                                                    </tr>
+                                                                    <tr class="row">
+                                                                        <td class="col-2">
+                                                                            <i class="fa-solid fa-check"></i>
+                                                                        </td>
+                                                                        <td class="col-2">상시</td>
+                                                                        <td class="col-8">리딩 20% 미만 학습자 관리를 하고 있는가?</td>
+                                                                    </tr>
+                                                                    <tr class="row">
+                                                                        <td class="col-2">
+                                                                            <i class="fa-solid fa-check"></i>
+                                                                        </td>
+                                                                        <td class="col-2">정기</td>
+                                                                        <td class="col-8">Final Report를 바탕으로 졸업 상담을 완료하였는가?</td>
+                                                                    </tr>
+
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 상담 리스트 -->
+                                <div id="counselling_body" class="card-body p-5 d-none">
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">상담</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">상담</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">상담</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">상담</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">상담</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">상담</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">상담</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">상담</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                </div>
+                                <!-- 요일 별 -->
+                                <div id="day_body" class="card-body p-5 d-none">
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">요일 별</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">요일 별</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">요일 별</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">요일 별</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">요일 별</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                    <div class="row work-list">
+                                        <div class="col-md-2 text-center">요일 별</div>
+                                        <div class="col-md-8 text-center">내용</div>
+                                        <div class="col-md-2 text-center">동작</div>
+                                    </div>
+                                </div>
+                                <!-- 완료 -->
+                                <div id="complete_body" class="card-body p-5 d-none">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="card col-12 mb-5">
+                                                <div class="card-header">
+                                                    <h6 class="p-2 pb-0"><strong>완료된 상담</strong></h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <table class="table text-center">
+                                                        <tbody>
+                                                            <tr class="row">
+                                                                <th class="col-2">반</th>
+                                                                <th class="col-2">원번</th>
+                                                                <th class="col-1">이름</th>
+                                                                <th class="col-3">내용</th>
+                                                                <th class="col-1">상태</th>
+                                                                <th class="col-3">상담일시</th>
+                                                            </tr>
+                                                            <tr class="row">
+                                                                <td class="col-2">DARTMOUTH1401</td>
+                                                                <td class="col-2">P220000</td>
+                                                                <td class="col-1">김ㅇㅇ</td>
+                                                                <td class="col-3">해피콜</td>
+                                                                <td class="col-1">완료</td>
+                                                                <td class="col-3">10:41</td>
+                                                            </tr>
+                                                            <tr class="row">
+                                                                <td class="col-2">P111111</td>
+                                                                <td class="col-2">우망치</td>
+                                                                <td class="col-3">미학습상담</td>
+                                                                <td class="col-2">완료</td>
+                                                                <td class="col-3">10:41</td>
+                                                            </tr>
+                                                            <tr class="row">
+                                                                <td class="col-2">P111111</td>
+                                                                <td class="col-2">우망치</td>
+                                                                <td class="col-3">미학습상담</td>
+                                                                <td class="col-2">완료</td>
+                                                                <td class="col-3">10:41</td>
+                                                            </tr>
+                                                            <tr class="row">
+                                                                <td class="col-2">P111111</td>
+                                                                <td class="col-2">우망치</td>
+                                                                <td class="col-3">미학습상담</td>
+                                                                <td class="col-2">완료</td>
+                                                                <td class="col-3">10:41</td>
+                                                            </tr>
+                                                            <tr class="row">
+                                                                <td class="col-2">P111111</td>
+                                                                <td class="col-2">우망치</td>
+                                                                <td class="col-3">미학습상담</td>
+                                                                <td class="col-2">완료</td>
+                                                                <td class="col-3">10:41</td>
+                                                            </tr>
+                                                            <tr class="row">
+                                                                <td class="col-2">P111111</td>
+                                                                <td class="col-2">우망치</td>
+                                                                <td class="col-3">미학습상담</td>
+                                                                <td class="col-2">완료</td>
+                                                                <td class="col-3">10:41</td>
+                                                            </tr>
+                                                            <tr class="row">
+                                                                <td class="col-2">P111111</td>
+                                                                <td class="col-2">우망치</td>
+                                                                <td class="col-3">미학습상담</td>
+                                                                <td class="col-2">완료</td>
+                                                                <td class="col-3">10:41</td>
+                                                            </tr>
+                                                            <tr class="row">
+                                                                <td class="col-2">P111111</td>
+                                                                <td class="col-2">우망치</td>
+                                                                <td class="col-3">미학습상담</td>
+                                                                <td class="col-2">완료</td>
+                                                                <td class="col-3">10:41</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h6 class="p-2 pb-0"><strong>완료된 업무</strong></h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row justify-content-center align-items-center mt-2 mb-4">
+                                                        <div class="col-4 ps-3">
+                                                            <p class="mb-0">반 별 업무</p>
+                                                        </div>
+                                                        <div class="col-7">
+                                                            <select class="form-select" aria-label="Default select example">
+                                                                <option selected>반을 선택하세요.</option>
+                                                                <option value="1">COLUMBIA P2</option>
+                                                                <option value="2">DARTMOUTH1401</option>
+                                                                <option value="3">Venus A2</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row justify-content-center align-items-center">
+                                                        <div class="col-11">
+                                                            <table class="table text-center">
+                                                                <tbody>
+                                                                    <tr class="row">
+                                                                        <th class="col-2">체크</th>
+                                                                        <th class="col-2">구분</th>
+                                                                        <th class="col-8">업무</th>
+                                                                    </tr>
+                                                                    <tr class="row">
+                                                                        <td class="col-2">
+                                                                            <i class="fa-solid fa-circle-check"></i>
+                                                                        </td>
+                                                                        <td class="col-2">요일</td>
+                                                                        <td class="col-8">IXL 주차 설정을 월요일 오전에 완료하였는가?</td>
+                                                                    </tr>
+                                                                    <tr class="row">
+                                                                        <td class="col-2">
+                                                                            <i class="fa-solid fa-circle-check"></i>
+                                                                        </td>
+                                                                        <td class="col-2">요일</td>
+                                                                        <td class="col-8">키즈노트 공지사항에 주차학습공지를 월요일에 업로드하였는가?</td>
+                                                                    </tr>
+                                                                    <tr class="row">
+                                                                        <td class="col-2">
+                                                                            <i class="fa-solid fa-circle-check"></i>
+                                                                        </td>
+                                                                        <td class="col-2">요일</td>
+                                                                        <td class="col-8">[리딩특공대] 선생님 코멘트를 월요일에 작성하였는가?</td>
+                                                                    </tr>
+                                                                    <tr class="row">
+                                                                        <td class="col-2">
+                                                                            <i class="fa-solid fa-circle-check"></i>
+                                                                        </td>
+                                                                        <td class="col-2">상시</td>
+                                                                        <td class="col-8">리딩 20% 미만 학습자 관리를 하고 있는가?</td>
+                                                                    </tr>
+                                                                    <tr class="row">
+                                                                        <td class="col-2">
+                                                                            <i class="fa-solid fa-circle-check"></i>
+                                                                        </td>
+                                                                        <td class="col-2">정기</td>
+                                                                        <td class="col-8">Final Report를 바탕으로 졸업 상담을 완료하였는가?</td>
+                                                                    </tr>
+
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="card-footer">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="card-container ms-auto">
+                    <div class="footer row top-border pt-3 pb-2">
+                        <div class="col-lg-6 text-center">
+                            <p class="px-3 mb-2">&copy; 2022 Copyright. <span class="text-purple">PURPLEACADEMY</span></p>
+                        </div>
+                        <div class="col-lg-6 text-center">
+                            <div class="row justify-content-center align-items-center">
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item mr-2">
+                                        <a href="https://www.instagram.com/purpleacademy1/" target="_blank" class="nav-link icon text-light"><img class="mb-2" src="../static/images/Instagram_Glyph_Gradient.png" width="21"></span></a>
+                                    </li>
+                                    <li class="list-inline-item mr-2">
+                                        <a href="https://www.youtube.com/c/livePURPLEACADEMY/featured" target="_blank" class="nav-link icon text-light"><i class="fa-brands fa-youtube text-youtube"></i></a>
+                                    </li>
+                                    <li class="list-inline-item mr-2">
+                                        <a href="https://cafe.naver.com/purplemam" target="_blank" class="nav-link icon text-light"><img class="mb-2" src="../static/images/naver_cafe.png" width="21"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 부트스트랩 번들 pooper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <!-- fontawesome -->
+    <script src="https://kit.fontawesome.com/a32d17aaaa.js" crossorigin="anonymous"></script>
+    <!-- script -->
+    <script type="text/javascript" src="../static/js/script.js"></script>
+</body>
+</html>
