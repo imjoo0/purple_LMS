@@ -6,7 +6,7 @@ function login() {
      $.ajax({
          type: "POST",
          url: "/api/login",
-         data: {id_give: $('#user_id').val(), pw_give: $('#password').val()},
+         data: {id_give: $('#userID').val(), pw_give: $('#userPW').val()},
          success: function (response) {
              if(response['result'] === 'success') {
                  $.cookie('token', response['token'])
@@ -20,7 +20,7 @@ function login() {
 }
 
 function checkNotEmpty() {
-    return $('#password').val().length >= 5 && $('#user_id').val().length > 0;
+    return $('#userPW').val().length >= 5 && $('#userID').val().length > 0;
 }
 
 $('.container').keyup('keyup', function(event) {
