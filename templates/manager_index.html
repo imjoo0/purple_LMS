@@ -26,48 +26,6 @@
 </head>
 <body>
 <!-- 모달 -->
-<!-- todo모달 -->
-<div class="modal fade" id="todo-add" tabindex="-1" aria-labelledby="todo-addModealLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-small" >
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title" id="TODOModealLabel">업무 등록</h5>
-                <button type="button" class="btn btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="container">
-                    {#                    <form class="input-group mb-3" action="/api/todo/{{ book.id }}" method="post">#}
-                    {#                        {% csrf_token %}#}
-                    {#                        <textarea class="form-control" cols="30" rows="5" id='my-review' name='my-review'#}
-                    {#                                  placeholder="리뷰를 작성 해 주세요" style="resize:none;"></textarea>#}
-                    {#                        <button class="btn btn-outline-secondary" type="submit">작성</button>#}
-                    {#                    </form>#}
-                    <fieldset>
-                        <legend>반복 주기를 설정해주세요:</legend>
-                        <div>
-                            <input type="checkbox" id="weekly" name="routine">
-                            <label for="weekly">매 주</label>
-                        </div>
-                        <div>
-                            <input type="checkbox" id="always" name="routine">
-                            <label for="always">상시</label>
-                        </div>
-                        <div>
-                            <input type="checkbox" id="monthly" name="routine">
-                            <label for="monthly">매 월</label>
-                        </div>
-                    </fieldset>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success">저장</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소</button>
-            </div>
-
-        </div>
-    </div>
-</div>
 <!-- 로그아웃 모달 -->
 <div class="modal fade" id="sign-out" tabindex="-1" aria-labelledby="signOutModealLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -210,9 +168,9 @@
                                                     <div class="col-7">
                                                         <select class="form-select" aria-label="Default select example">
                                                             <option selected>반을 선택하세요.</option>
-                                                            {% for class in my_classes %}
-                                                                <option value={{ class._id }}>{{ class.class_name }}</option>
-                                                            {% endfor %}
+                                                            <option value="1">COLUMBIA P2</option>
+                                                            <option value="2">DARTMOUTH1401</option>
+                                                            <option value="3">Venus A2</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -293,7 +251,7 @@
                                     <div class="col-6">
                                         <div class="card">
                                             <div class="card-header">
-                                                <h6 class="p-2 pb-0"><strong>오늘의 업무</strong></h6>
+                                                <h6 class="p-2 pb-0"><strong> 반 편집 </strong></h6>
                                             </div>
                                             <div class="card-body">
                                                 <div class="row justify-content-center align-items-center mt-2 mb-4">
@@ -301,40 +259,57 @@
                                                         <p class="mb-0">반 별 업무</p>
                                                     </div>
                                                     <div class="col-7">
-                                                        <select class="form-select" aria-label="Default select example">
+                                                        <select class="form-select" aria-label="Default select example" onchange="changeClassSelect()" id="select_class">
                                                             <option selected>반을 선택하세요.</option>
-                                                            {% for class in my_classes %}
-                                                                <option value={{ class._id }}>{{ class.class_name }}</option>
+                                                            {% for class in all_classes %}
+                                                                <option>{{ class.class_name }}</option>
                                                             {% endfor %}
+                                                            <option value="4">반 추가하기</option>
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="row justify-content-center align-items-center">
+                                                <div class="row justify-content-center align-items-center" id="add_class" style="display: none">
                                                     <div class="col-11">
                                                         <table class="table text-center">
                                                             <tbody>
                                                             <tr class="row">
-                                                                <th class="col-2">체크</th>
-                                                                <th class="col-2">구분</th>
-                                                                <th class="col-8">업무</th>
+                                                                <th class="col-6">담당선생님</th>
+                                                                <th class="col-6">반 명</th>
                                                             </tr>
                                                             <tr class="row">
-                                                                <td class="col-2">
-                                                                    <i class="fa-solid fa-check"></i>
+                                                                <td class="col-4">
+                                                                    <select class="form-select" aria-label="Default select example" id="select_teacher">
+                                                                        <option selected>담당선생님</option>
+                                                                        {% for teacher in all_teachers %}
+                                                                        <option>{{ teacher.name }}</option>
+                                                                        {% endfor %}
+                                                                    </select>
                                                                 </td>
-                                                                <td class="col-2">요일</td>
-                                                                <td class="col-8">IXL 주차 설정을 월요일 오전에 완료하였는가?</td>
+                                                                <td class="col-5"><input type="text" class="input" id="class_name" aria-describedby="emailHelp"
+                                                                                         placeholder="반명"></td>
+                                                                <td class="col-3"><button type="button" onclick="addClass()">저장</button></td>
                                                             </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="row justify-content-center align-items-center" id="edit_class">
+                                                    <div class="col-11">
+                                                        <table class="table text-center">
+                                                            <tbody>
                                                             <tr class="row">
-                                                                <td class="col-2">
-                                                                    <i class="fa-solid fa-check"></i>
-                                                                </td>
-                                                                <td class="col-2">요일</td>
-                                                                <td class="col-8">키즈노트 공지사항에 주차학습공지를 월요일에 업로드하였는가?</td>
+                                                                <th class="col-2">진도율</th>
+                                                                <th class="col-7">반이름</th>
+                                                                <th class="col-3">담당선생님</th>
                                                             </tr>
+                                                            {% for class in all_classes %}
                                                             <tr class="row">
-                                                                <td class="col-12"><button style="width: 100%" data-bs-toggle="modal" data-bs-target="#todo-add">todo 추가하기 ➕</button></td>
+                                                                <td class="col-2">{{ class.progress_rate }} %</td>
+                                                                <td class="col-7">{{ class.class_name }}</td>
+                                                                <td class="col-3">{{ class.teacher_id.name }}</td>
                                                             </tr>
+                                                            {% endfor %}
+
 
                                                             </tbody>
                                                         </table>

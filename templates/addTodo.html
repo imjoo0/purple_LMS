@@ -1,0 +1,16 @@
+{% extends index.html %}
+{% block style %}
+    <script>
+
+    </script>
+{% endblock %}
+
+{% block content %}
+
+    <form class="input-group mb-3" action="/book/review/{{ book.id }}" method="post">
+        {% csrf_token %}
+        <textarea class="form-control" cols="30" rows="5" id='my-review' name='my-review'
+                  placeholder="리뷰를 작성 해 주세요" style="resize:none;"></textarea>
+        <button class="btn btn-outline-secondary" type="submit">작성</button>
+    </form>
+{% endblock %}

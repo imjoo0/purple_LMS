@@ -29,7 +29,15 @@ def home():
         # 암호화되어있는 token의 값을 우리가 사용할 수 있도록 디코딩(암호화 풀기)해줍니다!
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user_info = db.user.find_one({"user_id": payload['id']})
-        return render_template('index.html', name=user_info["name"])
+        user_category = user_info["user_category_id"]
+        if user_category == 2:
+            my_classes = list(db.class_list.find({'teacher_id':user_info}))
+
+            return render_template('index.html', name=user_info["name"], my_classes=my_classes)
+        else:
+            all_classes = list(db.class_list.find())
+            all_teachers = list(db.user.find({"user_category_id": 2}))
+            return render_template('manager_index.html', name=user_info["name"],all_classes=all_classes,all_teachers=all_teachers)
         # 만약 해당 token의 로그인 시간이 만료되었다면, 아래와 같은 코드를 실행합니다.
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
@@ -101,6 +109,25 @@ def api_login():
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
+@app.route('/api/class', methods=['POST'])
+def api_add_class():
+    class_name_receive = request.form['class_name_give']
+    teacher_name_receive = request.form['teacher_name_give']
+
+    teacher = db.user.find_one({'name': teacher_name_receive, 'user_category_id': 2})
+    class_name_dup_check = db.class_list.find_one({'class_name':class_name_receive,'teacher_id':teacher})
+
+    # 찾으면 클래스 추가
+    if teacher is None:
+        return jsonify({'result': 'fail', 'msg': '담당자 선생님을 찾을 수 없습니다.'})
+    elif class_name_dup_check is not None:
+        return jsonify({'result': 'fail', 'msg': '이미 해당 반은 존재합니다.'})
+    # db 에 저장
+    else:
+        db.class_list.insert_one(
+            {'class_name': class_name_receive, 'teacher_id': teacher, 'consulting_num': 0, 'absent_rate': 0,
+             'progress_rate': 0})
+        return jsonify({'result': 'success'})
 
 # [유저 정보 확인 API]
 # 로그인된 유저만 call 할 수 있는 API입니다.
